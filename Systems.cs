@@ -31,7 +31,7 @@ namespace PoorMansECS.Systems {
             _systems.Remove(system);
         }
 
-        public T? Get<T>() where T : ISystem {
+        public T Get<T>() where T : ISystem {
             foreach (var system in _systems) {
                 if (system is T tSystem) {
                     return tSystem;
