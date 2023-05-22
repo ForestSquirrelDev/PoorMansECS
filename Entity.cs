@@ -2,44 +2,35 @@
 
 namespace PoorMansECS.Entities {
     public abstract class Entity : IEntity {
-        private readonly HashSet<IComponentData> _components = new HashSet<IComponentData>();
+        private readonly Dictionary<Type, IComponentData> _components = new Dictionary<Type, IComponentData>();
 
         protected Entity(IEnumerable<IComponentData> components) {
             foreach (var component in components) {
-                _components.Add(component);
+                _components[component.GetType()] = component;
             }
         }
 
         protected Entity() { }
 
-        public void AddComponent(IComponentData component) {
-            _components.Add(component);
+        public void SetComponent(IComponentData component) {
+            _components[component.GetType()] = component;
         }
 
-        public void SetComponent<T>(IComponentData component) where T : IComponentData {
-            _components.Remove(component);
-            _components.Add(component);
+        public void RemoveComponent<T>() where T: IComponentData {
+            _components.Remove(typeof(T));
         }
 
-        public void RemoveComponent<TComponent>() where TComponent: IComponentData {
-            IComponentData? componentToRemove = null;
-            foreach (var component in _components) {
-                if (component is TComponent) {
-                    componentToRemove = component;
-                    break;
-                }
+        public T GetComponent<T>() where T : IComponentData {
+            return (T)_components[typeof(T)];
+        }
+
+        public bool TryGetComponent<T>(out T componentData) where T: IComponentData {
+            if (_components.TryGetValue(typeof(T), out var component)) {
+                componentData = (T)component;
+                return true;
             }
-            
-            if (componentToRemove != null)
-                _components.Remove(componentToRemove);
-        }
-
-        public TComponent GetComponent<TComponent>() where TComponent : IComponentData {
-            foreach (var component in _components) {
-                if (component is TComponent tComponent)
-                    return tComponent;
-            }
-            return default;
+            componentData = default;
+            return false;        
         }
     }
 }

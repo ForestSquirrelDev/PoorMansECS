@@ -2,7 +2,7 @@
 
 namespace PoorMansECS.Entities {
     public interface IEntity {
-        public void AddComponent(IComponentData component);
+        public void SetComponent(IComponentData component);
         public void RemoveComponent<TComponent>() where TComponent : IComponentData;
         public TComponent? GetComponent<TComponent>() where TComponent : IComponentData;
     }

@@ -1,38 +1,51 @@
-﻿using System.Collections;
-
-namespace PoorMansECS.Entities {
-    public class Entities : IEnumerable<IEntity> {
-        private readonly List<IEntity> _entities = new List<IEntity>();
+﻿namespace PoorMansECS.Entities {
+    public class Entities {
+        private readonly Dictionary<Type, List<IEntity>> _entities = new Dictionary<Type, List<IEntity>>();
 
         public void Add(IEntity entity) {
-            _entities.Add(entity);
+            var entityType = entity.GetType();
+            if (!_entities.TryGetValue(entityType, out var entitiesSet)) {
+                entitiesSet = new List<IEntity>();
+                _entities[entityType] = entitiesSet;
+            }
+                
+            entitiesSet.Add(entity);
         }
 
         public T GetFirst<T>() where T : IEntity {
-            foreach (var entity in _entities) {
-                if (entity is T tEntity) {
-                    return tEntity;
-                }
+            var entityType = typeof(T);
+            var entitiesList = _entities[entityType];
+            return (T)entitiesList[0];
+        }
+
+        public bool TryGetFirst<T>(out T entity) where T : IEntity {
+            var entityType = typeof(T);
+            if (!_entities.TryGetValue(entityType, out var entitiesList)) {
+                entity = default;
+                return false;
             }
-            return default;
-        }
-
-        public IList<T> GetAll<T>() where T : IEntity {
-            var entities = new List<T>();
-            foreach (var entity in _entities) {
-                if (entity is T tEntity) {
-                    entities.Add(tEntity);
-                }
+            if (entitiesList.Count <= 0) {
+                entity = default;
+                return false;
             }
-            return entities;
+
+            entity = (T)entitiesList[0];
+            return true;
         }
 
-        public IEnumerator<IEntity> GetEnumerator() {
-            return ((IEnumerable<IEntity>)_entities).GetEnumerator();
+        public IReadOnlyList<IEntity> GetAll<T>() where T : IEntity {
+            var entityType = typeof(T);
+            var entitiesList = _entities[entityType];
+            return entitiesList;
         }
 
-        IEnumerator IEnumerable.GetEnumerator() {
-            return ((IEnumerable)_entities).GetEnumerator();
+        public bool TryGetAll<T>(out IReadOnlyList<IEntity> entitiesList) where T: IEntity {
+            if (!_entities.TryGetValue(typeof(T), out var list)) {
+                entitiesList = default;
+                return false;
+            }
+            entitiesList = list;
+            return true;
         }
     }
 }
