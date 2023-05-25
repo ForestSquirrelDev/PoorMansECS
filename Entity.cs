@@ -1,16 +1,10 @@
 ﻿using PoorMansECS.Components;
+using System;
+using System.Collections.Generic;
 
 namespace PoorMansECS.Entities {
     public abstract class Entity : IEntity {
         private readonly Dictionary<Type, IComponentData> _components = new Dictionary<Type, IComponentData>();
-
-        protected Entity(IEnumerable<IComponentData> components) {
-            foreach (var component in components) {
-                _components[component.GetType()] = component;
-            }
-        }
-
-        protected Entity() { }
 
         public void SetComponent(IComponentData component) {
             _components[component.GetType()] = component;

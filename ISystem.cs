@@ -1,5 +1,6 @@
 ﻿namespace PoorMansECS.Systems {
     public interface ISystem : IUpdateable {
-        public void Start();
+        void Start();
+        void Stop();
     }
 }

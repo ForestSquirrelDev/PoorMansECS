@@ -1,4 +1,6 @@
-﻿using PoorMansECS.Systems;
+﻿using PoorMansECS.Entities;
+using PoorMansECS.Systems;
+using System;
 
 namespace PoorMansECS {
     public class World : IUpdateable {
@@ -12,7 +14,7 @@ namespace PoorMansECS {
             Entities = new Entities.Entities();
             _eventBus = new SystemsEventBus();
             _systems = new Systems.Systems();
-            _systemsContext = new SystemsContext(Entities, _eventBus);
+            _systemsContext = new SystemsContext(this, _eventBus);
         }
 
         public void Start() {
@@ -37,6 +39,16 @@ namespace PoorMansECS {
 
         public T GetSystem<T>() where T : SystemBase {
             return _systems.Get<T>();
+        }
+
+        public T CreateEntity<T>() where T: IEntity, new() {
+            var entity = new T();
+            Entities.Add(entity);
+            return entity;
+        }
+
+        public void Stop() {
+            _systems.Stop();
         }
     }
 }

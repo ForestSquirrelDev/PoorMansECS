@@ -1,21 +1,25 @@
-﻿namespace PoorMansECS.Entities {
+﻿using System;
+using System.Collections.Generic;
+using System.Collections;
+
+namespace PoorMansECS.Entities {
     public class Entities {
         private readonly Dictionary<Type, List<IEntity>> _entities = new Dictionary<Type, List<IEntity>>();
-
-        public void Add(IEntity entity) {
-            var entityType = entity.GetType();
-            if (!_entities.TryGetValue(entityType, out var entitiesSet)) {
-                entitiesSet = new List<IEntity>();
-                _entities[entityType] = entitiesSet;
-            }
-                
-            entitiesSet.Add(entity);
-        }
 
         public T GetFirst<T>() where T : IEntity {
             var entityType = typeof(T);
             var entitiesList = _entities[entityType];
             return (T)entitiesList[0];
+        }
+
+        public T GetFirst<T>(Func<IEntity, bool> condition) where T: IEntity {
+            var entityType = typeof(T);
+            var entitiesList = _entities[entityType];
+            foreach (var entity in entitiesList) {
+                if (condition(entity))
+                    return (T)entity;
+            }
+            return default;
         }
 
         public bool TryGetFirst<T>(out T entity) where T : IEntity {
@@ -46,6 +50,16 @@
             }
             entitiesList = list;
             return true;
+        }
+
+        internal void Add(IEntity entity) {
+            var entityType = entity.GetType();
+            if (!_entities.TryGetValue(entityType, out var entitiesSet)) {
+                entitiesSet = new List<IEntity>();
+                _entities[entityType] = entitiesSet;
+            }
+
+            entitiesSet.Add(entity);
         }
     }
 }

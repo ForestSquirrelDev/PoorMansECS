@@ -1,13 +1,9 @@
-﻿namespace PoorMansECS.Systems {
+﻿using System;
+using System.Collections.Generic;
+
+namespace PoorMansECS.Systems {
     public class Systems : IUpdateable{
         private readonly Dictionary<Type, ISystem> _systems = new Dictionary<Type, ISystem>();
-
-        public Systems() { }
-
-        public Systems(IEnumerable<ISystem> systems) {
-            foreach (var system in systems)
-                _systems.Add(system.GetType(), system);
-        }
 
         public void Start() {
             foreach (var system in _systems.Values) {
@@ -21,11 +17,20 @@
             }
         }
 
+        public void Stop() {
+            foreach (var system in _systems.Values) {
+                system.Stop();
+            }
+        }
+
         public void Add(ISystem system) {
             _systems.Add(system.GetType(), system);
         }
 
         public void Remove<T>() where T: ISystem {
+            if (!_systems.TryGetValue(typeof(T), out var system))
+                return;
+            system.Stop();
             _systems.Remove(typeof(T));
         }
 

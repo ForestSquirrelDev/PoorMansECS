@@ -14,7 +14,12 @@
             OnUpdate(delta);
         }
 
+        public void Stop() {
+            OnStop();
+        }
+
         protected abstract void OnStart();
         protected abstract void OnUpdate(float delta);
+        protected abstract void OnStop();
     }
 }

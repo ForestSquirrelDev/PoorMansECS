@@ -1,10 +1,10 @@
 ﻿namespace PoorMansECS.Systems {
     public class SystemsContext {
-        public Entities.Entities Entities { get; }
+        public World World { get; }
         public SystemsEventBus EventBus { get; }
 
-        public SystemsContext(Entities.Entities entities, SystemsEventBus eventBus) {
-            Entities = entities;
+        public SystemsContext(World world, SystemsEventBus eventBus) {
+            World = world;
             EventBus = eventBus;
         }
     }
