@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PoorMansECS.Systems {
     public class Systems : IUpdateable{
@@ -17,17 +18,17 @@ namespace PoorMansECS.Systems {
             }
         }
 
-        public void Stop() {
+        internal void Stop() {
             foreach (var system in _systems.Values) {
                 system.Stop();
             }
         }
 
-        public void Add(ISystem system) {
+        internal void Add(ISystem system) {
             _systems.Add(system.GetType(), system);
         }
 
-        public void Remove<T>() where T: ISystem {
+        internal void Remove<T>() where T: ISystem {
             if (!_systems.TryGetValue(typeof(T), out var system))
                 return;
             system.Stop();
@@ -36,6 +37,10 @@ namespace PoorMansECS.Systems {
 
         public T Get<T>() where T : ISystem {
             return (T)_systems[typeof(T)];
+        }
+
+        public IReadOnlyList<ISystem> GetAll() {
+            return _systems.Values.ToList();
         }
 
         public bool TryGet<T>(out T system) where T: ISystem {

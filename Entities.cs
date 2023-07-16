@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
+using System.Linq;
 
 namespace PoorMansECS.Entities {
     public class Entities {
@@ -52,6 +52,10 @@ namespace PoorMansECS.Entities {
             return true;
         }
 
+        public IReadOnlyList<IEntity> GetAllEntitiesFlatListed() {
+            return _entities.Values.SelectMany(_ => _).Cast<IEntity>().ToList();
+        }
+
         internal void Add(IEntity entity) {
             var entityType = entity.GetType();
             if (!_entities.TryGetValue(entityType, out var entitiesSet)) {
@@ -60,6 +64,20 @@ namespace PoorMansECS.Entities {
             }
 
             entitiesSet.Add(entity);
+        }
+
+        internal void RemoveAllEntitiesOfType<T>() where T : IEntity {
+            _entities.Remove(typeof(T));
+        }
+
+        internal void RemoveEntity(IEntity entity) {
+            var entityType = entity.GetType();
+            var entitiesList = _entities[entityType];
+            entitiesList.Remove(entity);
+        }
+
+        internal void RemoveAll() {
+            _entities.Clear();
         }
     }
 }

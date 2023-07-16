@@ -1,3 +1,3 @@
 ﻿namespace PoorMansECS.Components {
-    public interface IComponentData { }
+    public interface IComponent { }
 }
